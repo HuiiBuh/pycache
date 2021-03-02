@@ -1,0 +1,23 @@
+[tool.poetry]
+name = "pycache"
+version = "0.1.0"
+description = "Simple to use caching decorator with more capabilites than the default one."
+license = "MIT"
+authors = ["HuiiBuh"]
+maintainers = ["HuiiBuh"]
+readme = "README.md"
+homepage = "" # TODO
+repository = "" # TODO
+keywords = ["cache", "caching", "method", "function"]
+
+[tool.poetry.dependencies]
+python = "^3.6"
+
+[tool.poetry.dev-dependencies]
+pytest = "^5.2"
+toml = "^0.10.2"
+coverage = "^5.5"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
