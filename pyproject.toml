@@ -1,14 +1,18 @@
 [tool.poetry]
-name = "pycache"
+name = "py-cache"
 version = "0.1.0"
 description = "Simple to use caching decorator with more capabilites than the default one."
 license = "MIT"
 authors = ["HuiiBuh"]
 maintainers = ["HuiiBuh"]
 readme = "README.md"
-homepage = "" # TODO
-repository = "" # TODO
+homepage = "https://github.com/HuiiBuh/pycache"
+repository = "https://github.com/HuiiBuh/pycache"
 keywords = ["cache", "caching", "method", "function"]
+
+packages = [
+    { include = "pycache" },
+]
 
 [tool.poetry.dependencies]
 python = "^3.6"

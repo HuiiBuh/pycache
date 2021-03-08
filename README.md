@@ -21,7 +21,7 @@ Use a cache which expires after a certain amount of time:
 from pycache import cache
 
 
-# The format for expires_every is `hh:mm:ss`
+# The format for expires_every is <hh:mm:ss>
 # This cache would expire every 10 seconds
 @cache(expires_every="*:*:10")
 def please_cache():
@@ -40,20 +40,14 @@ Use a cache which expires every time at a certain time (A bit like a cron job).
 from pycache import cache
 
 
-# The format for schedule is `hh:mm:ss`
-# This cache would expire day at 15:10:05
+# The format for schedule is <hh:mm:ss>
+# This cache would expire every day at 15:10:05
 @cache(schedule="15:10:05")
 def please_cache():
     pass
 
 
-# This cache would expire hour 8 minutes after
-@cache(schedule="*:08:00")
-def please_cache():
-    pass
-
-
-# This cache would expire hour 8 minutes after
+# This cache would expire every hour 8 minutes after a full hour
 @cache(schedule="*:08:00")
 def please_cache():
     pass
@@ -79,6 +73,7 @@ please_cache("hello")
 # Gets placed in cache and "hello" gets removed
 please_cache("world")
 
-# Is not found in cache, because "world" is the only cache entry, because the cache size is 1
+# Is not found in cache, because "world" is the only cache entry, 
+# because the cache size is one
 please_cache("hello")
 ```
