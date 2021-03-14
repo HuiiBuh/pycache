@@ -1,4 +1,7 @@
 # Method cache
+[![codecov](https://codecov.io/gh/HuiiBuh/pycache/branch/master/graph/badge.svg?token=WYBEMXAQVO)](https://codecov.io/gh/HuiiBuh/pycache)
+[![Upload Python Package](https://github.com/HuiiBuh/pycache/actions/workflows/publish.yml/badge.svg)](https://github.com/HuiiBuh/pycache/actions/workflows/publish.yml)
+## Why
 
 If you want to cache the calls to a specific method or function you could use the python `functools.cache` decorator. If
 this has not enough configuration options for your taste, or you work with arguments which are not hashable this cache
