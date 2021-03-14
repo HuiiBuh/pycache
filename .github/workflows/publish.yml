@@ -27,10 +27,9 @@ jobs:
       run: poetry run pytest
     - name: Build package
       run: poetry build
-    - name: Create environment variables
+    - name: Publish package
       env:
         POETRY_PYPI_TOKEN_PYPI: ${{ secrets.PYPI_TOKEN }}
-    - name: Publish package
       run: poetry publish
       
       
