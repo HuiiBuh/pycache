@@ -1,4 +1,5 @@
 import re
+from calendar import monthrange
 from datetime import datetime, timedelta
 from typing import Optional
 
@@ -45,6 +46,8 @@ class Timer:
         s = split_str[2]
 
         current = datetime.now()
+        years = current.year
+        months = current.month
         days = current.day
 
         if not re.search("^\\*+$", s):
@@ -69,7 +72,20 @@ class Timer:
         else:
             days += 1
 
-        return datetime(current.year, current.month, days, hours, minutes, seconds)
+        # Verify that the data is valid and if not handle the overflow
+        if minutes > 59:
+            hours += 1
+
+        if hours > 23:
+            days += 1
+
+        if days > monthrange(current.year, current.month)[1]:
+            months += 1
+
+        if months > 12:
+            years += 1
+
+        return datetime(years, months, days, hours, minutes, seconds)
 
     def has_expired(self) -> bool:
         return self._expiry_date < datetime.now()
