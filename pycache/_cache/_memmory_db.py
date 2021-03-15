@@ -1,26 +1,15 @@
-from datetime import datetime
 from typing import Optional, Any, Dict, Callable, Hashable
 
-from pycache._singleton import Singleton
-from pycache._timer import Timer
+from _cache._timer import Timer
+from _shared._parser import ScheduleType
+from _shared._singleton import Singleton
 
 
 class CacheEntry:
     def __init__(self):
         self._value: Optional[Any] = None
-        self._timer = Timer(datetime.now())
+        self._timer = Timer()
         self._was_set = False
-
-    @staticmethod
-    def _verify_scheduler(expires_every: str, cron_schedule: str) -> None:
-        specify_count = 0
-        if expires_every:
-            specify_count += 1
-        if cron_schedule:
-            specify_count += 1
-
-        if specify_count != 1:
-            raise Exception("Specify exactly one timing method.")
 
     @property
     def value(self) -> Any:
@@ -35,9 +24,8 @@ class CacheEntry:
     def is_valid(self) -> bool:
         return self._was_set and not self._timer.has_expired()
 
-    def set_expiry(self, expires_every: str = None, schedule: str = None) -> None:
-        CacheEntry._verify_scheduler(expires_every, schedule)
-        self._timer.set_expiry(expires_every, schedule)
+    def set_expiry(self, schedule_type: ScheduleType, schedule_str: str) -> None:
+        self._timer.set_schedule(schedule_type, schedule_str)
 
 
 class FunctionCache:
@@ -54,19 +42,16 @@ class FunctionCache:
             return self.cache[key].value
         raise Exception("Value could not be found")
 
-    def add_cache_entry(self,
-                        key: int,
-                        value: Any,
-                        expires_every: str,
-                        schedule: str
-                        ) -> None:
+    def add_cache_entry(self, key: int, value: Any, schedule_type: ScheduleType, schedule_str: str) -> None:
         if key not in self.cache:
+
+            # Check if to many cache entries
             key_list = list(self.cache.keys())
             if len(key_list) >= self.max_cache_entries:
                 del self.cache[key_list[0]]
 
             self.cache[key] = CacheEntry()
-            self.cache[key].set_expiry(expires_every, schedule)
+            self.cache[key].set_expiry(schedule_type, schedule_str)
         self.cache[key].value = value
 
 

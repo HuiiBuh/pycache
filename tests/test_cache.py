@@ -5,9 +5,14 @@ import pytest
 import toml
 from time import sleep
 
-from pycache._memmory_db import DataCache, FunctionCache
+from _cache._memmory_db import DataCache, FunctionCache
+from _shared._singleton import Singleton
 from pycache import __version__, cache
-from pycache._memmory_db import DataCache as CDataCache
+from pycache._cache._memmory_db import DataCache as CDataCache
+
+
+class ThirdSingleton(metaclass=Singleton):
+    pass
 
 
 def test_singleton():
@@ -17,6 +22,11 @@ def test_singleton():
 
     assert c2.cache["hello"] == "world"
     assert c1 is c2
+
+    c3 = ThirdSingleton()
+    c4 = ThirdSingleton()
+    assert c3 is c4
+    assert c2 is not c3 and c1 is not c3
 
 
 def test_version():
@@ -98,7 +108,7 @@ def test_schedule_time():
         def cache_method():
             pass
 
-        wrapped_cache_method = cache(schedule=cache_str)(cache_method)
+        wrapped_cache_method = cache(expires_at=cache_str)(cache_method)
 
         wrapped_cache_method()
 
@@ -143,12 +153,10 @@ def test_async():
 
 
 def test_to_many_args():
-    @cache(expires_every="*:*:1", schedule="*:*:1")
-    def cache_method(_):
-        pass
-
     with pytest.raises(Exception):
-        cache_method("")
+        @cache(expires_every="*:*:1", expires_at="*:*:1")
+        def cache_method(_):
+            pass
 
 
 def test_get_invalid_value():
@@ -204,7 +212,7 @@ def test_large_cache_size():
 
 def test_schedule_and_expire():
     def internal(schedule: str, expected: int, s=0):
-        @cache(schedule=schedule)
+        @cache(expires_at=schedule)
         def cache_method(c):
             c["value"] += 1
 
@@ -220,6 +228,8 @@ def test_schedule_and_expire():
 
     now = datetime.now()
     internal(f"{now.hour}:{now.minute}:{now.second + 1}", 1)
+    now = datetime.now()
     internal(f"*:*:{now.second}", 2, 61)
+    now = datetime.now()
     internal(f"*:1:{now.second}", 1, 0)
     internal(f"*:1:*", 1, 0)
