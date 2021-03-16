@@ -4,7 +4,6 @@ from datetime import datetime
 from time import sleep
 
 from pycache import add_schedule, schedule
-from pycache._scheduler._scheduler import ScheduleSubscription
 
 
 def test_interval():
@@ -37,11 +36,11 @@ def test_start():
         counter["hello"] += 1
 
     schedule_subscription = add_schedule(internal, "0:0:1")
-    sleep(1.5)
+    sleep(2.5)
     schedule_subscription.stop()
     sleep(10)
     schedule_subscription.start()
-    sleep(1.5)
+    sleep(2.5)
     schedule_subscription.stop()
 
     assert counter["hello"] == 4
@@ -53,9 +52,9 @@ def test_count():
     async def internal():
         counter["hello"] += 1
 
-    schedule = add_schedule(internal, "0:0:1", stop_after=3)
-    sleep(4)
-    schedule.stop()
+    schedule_subscription = add_schedule(internal, call_every="0:0:1", stop_after=3)
+    sleep(4.5)
+    schedule_subscription.stop()
 
     assert counter["hello"] == 3
 
@@ -71,7 +70,7 @@ def test_multiple_scheduler():
 
     schedule1 = add_schedule(internal1, "0:0:1")
     schedule2 = add_schedule(internal2, "0:0:1")
-    sleep(2.5)
+    sleep(3.5)
     schedule1.stop()
     schedule2.stop()
 
@@ -86,7 +85,7 @@ def test_expire_at():
 
     current = datetime.now()
     schedule_subscription = add_schedule(internal, call_at=f"{current.hour}:{current.minute}:{current.second + 2}")
-    sleep(1)
+    sleep(2)
     schedule_subscription.stop()
 
     assert counter["hello"] == 1
@@ -98,13 +97,14 @@ def test_call_from_async():
     async def internal():
         counter["hello"] += 1
 
+    loop = asyncio.get_event_loop()
+
     async def call():
-        current = datetime.now()
-        schedule_subscription = add_schedule(internal, call_at=f"{current.hour}:{current.minute}:{current.second + 2}")
+        schedule_subscription = add_schedule(internal, call_every=f"0:0:1",
+                                             event_loop=loop)
         await asyncio.sleep(1)
         schedule_subscription.stop()
 
-    loop = ScheduleSubscription._get_or_create_event_loop()
     loop.run_until_complete(call())
 
     assert counter["hello"] == 1

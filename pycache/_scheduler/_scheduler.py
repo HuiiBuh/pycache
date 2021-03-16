@@ -1,5 +1,6 @@
 import asyncio
 import threading
+from asyncio import AbstractEventLoop
 from datetime import datetime
 from typing import Callable, Any, Tuple, Dict
 
@@ -7,20 +8,21 @@ from pycache._shared._parser import parse_expires_at, get_schedule_type, Schedul
 
 
 class ScheduleSubscription:
-    def __init__(self, schedule_type: ScheduleType, schedule_str: str, func: Callable, stop_after: int, args, kwargs):
+    def __init__(self, schedule_type: ScheduleType, schedule_str: str, func: Callable, event_loop: AbstractEventLoop,
+                 stop_after: int, args, kwargs):
         self._stop_after = stop_after
         self._schedule_type = schedule_type
         self._schedule_str = schedule_str
         self._args = args
         self._kwargs = kwargs
         self._func = func
+        self._event_loop = event_loop
 
         self._thread = threading.Thread(target=self._schedule)
         self._kill = threading.Event()
         self._thread.start()
 
-    @staticmethod
-    def _get_or_create_event_loop():
+    def _get_or_create_event_loop(self):
         try:
             return asyncio.get_event_loop()
         except RuntimeError as ex:
@@ -36,8 +38,11 @@ class ScheduleSubscription:
                 break
 
             if asyncio.iscoroutinefunction(self._func):
-                loop = ScheduleSubscription._get_or_create_event_loop()
-                loop.run_until_complete(self._func(*self._args, **self._kwargs))
+                if self._event_loop:
+                    asyncio.ensure_future(self._func(*self._args, **self._kwargs), loop=self._event_loop)
+                else:
+                    loop = self._get_or_create_event_loop()
+                    loop.run_until_complete(self._func(*self._args, **self._kwargs))
             else:
                 self._func(*self._args, **self._kwargs)
 
@@ -70,11 +75,12 @@ def schedule(
         call_every: str = None,
         call_at: str = None,
         stop_after: int = None,
+        event_loop: AbstractEventLoop = None,
         args: Tuple[Any] = (),
         kwargs: Dict[str, Any] = None
 ):
     def wrapper(func: Callable):
-        add_schedule(func, call_every, call_at, stop_after, args, kwargs)
+        add_schedule(func, call_every, call_at, stop_after, event_loop, args, kwargs)
 
     return wrapper
 
@@ -83,6 +89,7 @@ def add_schedule(func: Callable,
                  call_every: str = None,
                  call_at: str = None,
                  stop_after: int = None,
+                 event_loop: AbstractEventLoop = None,
                  args: Tuple[Any] = (),
                  kwargs: Dict[str, Any] = None
                  ) -> ScheduleSubscription:
@@ -91,4 +98,4 @@ def add_schedule(func: Callable,
     if kwargs is None:
         kwargs = {}
 
-    return ScheduleSubscription(schedule_type, schedule_str, func, stop_after, args, kwargs)
+    return ScheduleSubscription(schedule_type, schedule_str, func, event_loop, stop_after, args, kwargs)

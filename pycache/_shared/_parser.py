@@ -48,32 +48,33 @@ def parse_expires_at(schedule_str: str, current: datetime = None) -> datetime:
     # Check if the template syntax has the right ranges
     _test_valid_string(seconds, minutes, hours)
 
-    # If Minutes is the smallest wildcard
-    if re.search("^\\*+$", h) and re.search("^\\*+$", m):
-        minutes += 1
-    # If Hours is the smallest wildcard
-    elif re.search("^\\*+$", h):
-        hours += 1
-    # If There is no wildcard
-    else:
-        days += 1
+    if current >= datetime(years, months, days, hours, minutes, seconds):
+        # If Minutes is the smallest wildcard
+        if re.search("^\\*+$", h) and re.search("^\\*+$", m):
+            minutes += 1
+        # If Hours is the smallest wildcard
+        elif re.search("^\\*+$", h):
+            hours += 1
+        # If There is no wildcard
+        else:
+            days += 1
 
-    # Verify that the data is valid and if not handle the overflow
-    if minutes == 60:
-        hours += 1
-        minutes = 0
+        # Verify that the data is valid and if not handle the overflow
+        if minutes == 60:
+            hours += 1
+            minutes = 0
 
-    if hours == 24:
-        days += 1
-        hours = 0
+        if hours == 24:
+            days += 1
+            hours = 0
 
-    if days == monthrange(current.year, current.month)[1] + 1:
-        months += 1
-        days = 1
+        if days == monthrange(current.year, current.month)[1] + 1:
+            months += 1
+            days = 1
 
-    if months > 12:
-        years += 1
-        months = 1
+        if months > 12:
+            years += 1
+            months = 1
 
     return datetime(years, months, days, hours, minutes, seconds)
 
