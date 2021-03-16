@@ -31,15 +31,15 @@ class ScheduleSubscription:
 
     def _schedule(self):
         while self._continue_running():
+            is_killed = self._kill.wait(self._run_in())
+            if is_killed:
+                break
+
             if asyncio.iscoroutinefunction(self._func):
                 loop = ScheduleSubscription._get_or_create_event_loop()
                 loop.run_until_complete(self._func(*self._args, **self._kwargs))
             else:
                 self._func(*self._args, **self._kwargs)
-
-            is_killed = self._kill.wait(self._run_in())
-            if is_killed:
-                break
 
             if self._stop_after is not None:
                 self._stop_after -= 1
