@@ -1,8 +1,8 @@
 from typing import Optional, Any, Dict, Callable, Hashable
 
-from _cache._timer import Timer
-from _shared._parser import ScheduleType
-from _shared._singleton import Singleton
+from pycache._cache._timer import Timer
+from pycache._shared._parser import ScheduleType
+from pycache._shared._singleton import Singleton
 
 
 class CacheEntry:

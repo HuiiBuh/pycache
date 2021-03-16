@@ -1,7 +1,7 @@
 from datetime import datetime, timedelta
 from typing import Optional
 
-from _shared._parser import parse_expires_every, parse_expires_at, ScheduleType
+from pycache._shared._parser import parse_expires_every, parse_expires_at, ScheduleType
 
 
 class Timer:
