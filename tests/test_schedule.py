@@ -1,7 +1,9 @@
+import asyncio
 from datetime import datetime
 
 from time import sleep
 
+from _scheduler._scheduler import ScheduleSubscription
 from pycache import add_schedule, schedule
 
 
@@ -20,7 +22,7 @@ def test_interval():
 def test_pass_args():
     counter = {"hello": 0}
 
-    @schedule(expires_every="0:0:1", args=(counter,), kwargs={"b": 1}, stop_after=2)
+    @schedule(call_every="0:0:1", args=(counter,), kwargs={"b": 1}, stop_after=2)
     def internal(a, b):
         a["hello"] += b
 
@@ -83,8 +85,26 @@ def test_expire_at():
         counter["hello"] += 1
 
     current = datetime.now()
-    schedule_subscription = add_schedule(internal, expires_at=f"{current.hour}:{current.minute}:{current.second + 2}")
+    schedule_subscription = add_schedule(internal, call_at=f"{current.hour}:{current.minute}:{current.second + 2}")
     sleep(1)
     schedule_subscription.stop()
+
+    assert counter["hello"] == 1
+
+
+def test_call_from_async():
+    counter = {"hello": 0}
+
+    async def internal():
+        counter["hello"] += 1
+
+    async def call():
+        current = datetime.now()
+        schedule_subscription = add_schedule(internal, call_at=f"{current.hour}:{current.minute}:{current.second + 2}")
+        await asyncio.sleep(1)
+        schedule_subscription.stop()
+
+    loop = ScheduleSubscription._get_or_create_event_loop()
+    loop.run_until_complete(call())
 
     assert counter["hello"] == 1

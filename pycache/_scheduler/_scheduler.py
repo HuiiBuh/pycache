@@ -15,9 +15,9 @@ class ScheduleSubscription:
         self._kwargs = kwargs
         self._func = func
 
-        self.thread = threading.Thread(target=self._schedule)
+        self._thread = threading.Thread(target=self._schedule)
         self._kill = threading.Event()
-        self.thread.start()
+        self._thread.start()
 
     @staticmethod
     def _get_or_create_event_loop():
@@ -58,35 +58,35 @@ class ScheduleSubscription:
 
     def stop(self):
         self._kill.set()
-        self.thread.join(2)
+        self._thread.join(2)
         self._kill.clear()
 
     def start(self):
-        self.thread = threading.Thread(target=self._schedule)
-        self.thread.start()
+        self._thread = threading.Thread(target=self._schedule)
+        self._thread.start()
 
 
 def schedule(
-        expires_every: str = None,
-        expires_at: str = None,
+        call_every: str = None,
+        call_at: str = None,
         stop_after: int = None,
         args: Tuple[Any] = (),
         kwargs: Dict[str, Any] = None
 ):
     def wrapper(func: Callable):
-        add_schedule(func, expires_every, expires_at, stop_after, args, kwargs)
+        add_schedule(func, call_every, call_at, stop_after, args, kwargs)
 
     return wrapper
 
 
 def add_schedule(func: Callable,
-                 expires_every: str = None,
-                 expires_at: str = None,
+                 call_every: str = None,
+                 call_at: str = None,
                  stop_after: int = None,
                  args: Tuple[Any] = (),
                  kwargs: Dict[str, Any] = None
                  ) -> ScheduleSubscription:
-    schedule_type, schedule_str = get_schedule_type(expires_every, expires_at)
+    schedule_type, schedule_str = get_schedule_type(call_every, call_at)
 
     if kwargs is None:
         kwargs = {}

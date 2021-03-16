@@ -20,21 +20,23 @@ cache decorator could be useful.
 
 ## Usage
 
-Use a _cache which expires after a certain amount of time:
+### Cache
+
+Use a cache which expires after a certain amount of time:
 
 ```python
-from pycache import _cache
+from pycache import cache
 
 
 # The format for schedule_type is <hh:mm:ss>
 # This _cache would expire every 10 seconds
-@_cache(expires_every="*:*:10")
+@cache(expires_at="*:*:10")
 def please_cache():
     pass
 
 
 # This _cache would expire every 5 minutes and 10 seconds
-@_cache(expires_every="*:5:10")
+@cache(expires_every="*:5:10")
 def please_cache():
     pass
 ```
@@ -42,18 +44,18 @@ def please_cache():
 Use a _cache which expires every time at a certain time (A bit like a cron job).
 
 ```python
-from pycache import _cache
+from pycache import cache
 
 
 # The format for _schedule_str is <hh:mm:ss>
 # This _cache would expire every day at 15:10:05
-@_cache(expires_at="15:10:05")
+@cache(expires_at="15:10:05")
 def please_cache():
     pass
 
 
 # This _cache would expire every hour 8 minutes after a full hour
-@_cache(expires_at="*:08:00")
+@cache(expires_at="*:08:00")
 def please_cache():
     pass
 ```
@@ -61,11 +63,11 @@ def please_cache():
 Limit the number of _cache entries
 
 ```python
-from pycache import _cache
+from pycache import cache
 
 
 # This would result in only one _cache entry
-@_cache(expires_every="*:*:10", max_cache_size=1)
+@cache(expires_every="*:*:10", max_cache_size=1)
 def please_cache(data: str):
     pass
 
@@ -81,4 +83,48 @@ please_cache("world")
 # Is not found in _cache, because "world" is the only _cache entry, 
 # because the _cache size is one
 please_cache("hello")
+```
+
+### Schedule
+
+```python3
+from pycache import schedule, add_schedule, ScheduleSubscription
+
+
+# Gets called every 10 seconds
+@schedule(call_every="*:*:10")
+def schedule_me():
+    pass
+
+
+# Gets called every at 10 am
+@schedule(call_every="10:00:00")
+def schedule_me():
+    pass
+
+
+# Gets called 3 times
+@schedule(call_every="10:00:00", stop_after=3)
+def schedule_me():
+    pass
+
+
+# Call with args and keyword args
+@schedule(call_every="10:00:00", args=(3,), kwargs={"hello": "world"})
+def schedule_me(three: int, hello: str):
+    pass
+
+
+def schedule_programmatically():
+    pass
+
+
+# Call this every five seconds
+schedule_subscription: ScheduleSubscription = add_schedule(schedule_programmatically, call_every="*:*:5")
+
+# Stop the schedule call
+schedule_subscription.stop()
+
+# Start the schedule again
+schedule_subscription.stop()
 ```
