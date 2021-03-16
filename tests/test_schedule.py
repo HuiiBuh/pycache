@@ -3,8 +3,8 @@ from datetime import datetime
 
 from time import sleep
 
-from _scheduler._scheduler import ScheduleSubscription
 from pycache import add_schedule, schedule
+from pycache._scheduler._scheduler import ScheduleSubscription
 
 
 def test_interval():
