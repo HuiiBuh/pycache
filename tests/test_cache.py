@@ -5,10 +5,10 @@ import pytest
 import toml
 from time import sleep
 
-from _cache._memmory_db import DataCache, FunctionCache
-from _shared._singleton import Singleton
 from pycache import __version__, cache
+from pycache._cache._memmory_db import DataCache, FunctionCache
 from pycache._cache._memmory_db import DataCache as CDataCache
+from pycache._shared._singleton import Singleton
 
 
 class ThirdSingleton(metaclass=Singleton):

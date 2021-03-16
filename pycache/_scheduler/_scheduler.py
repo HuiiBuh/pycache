@@ -1,6 +1,5 @@
 import asyncio
 import threading
-from asyncio import sleep
 from datetime import datetime
 from typing import Callable, Any, Tuple, Dict
 
@@ -15,15 +14,13 @@ class ScheduleSubscription:
         self._args = args
         self._kwargs = kwargs
         self._func = func
-        self._running = True
 
-        threading.Thread(target=self._start).start()
+        self.thread = threading.Thread(target=self._schedule)
+        self._kill = threading.Event()
+        self.thread.start()
 
-    def _start(self):
-        loop = self._get_or_create_eventloop()
-        loop.run_until_complete(self._schedule())
-
-    def _get_or_create_eventloop(self):
+    @staticmethod
+    def _get_or_create_event_loop():
         try:
             return asyncio.get_event_loop()
         except RuntimeError as ex:
@@ -32,13 +29,18 @@ class ScheduleSubscription:
                 asyncio.set_event_loop(loop)
                 return asyncio.get_event_loop()
 
-    async def _schedule(self):
-        while self._running and self._continue_running():
+    def _schedule(self):
+        while self._continue_running():
             if asyncio.iscoroutinefunction(self._func):
-                await self._func(*self._args, **self._kwargs)
+                loop = ScheduleSubscription._get_or_create_event_loop()
+                loop.run_until_complete(self._func(*self._args, **self._kwargs))
             else:
                 self._func(*self._args, **self._kwargs)
-            await sleep(self._run_in())
+
+            is_killed = self._kill.wait(self._run_in())
+            if is_killed:
+                break
+
             if self._stop_after is not None:
                 self._stop_after -= 1
 
@@ -55,10 +57,13 @@ class ScheduleSubscription:
             return (parse_expires_at(self._schedule_str) - datetime.now()).total_seconds()
 
     def stop(self):
-        self._running = False
+        self._kill.set()
+        self.thread.join(2)
+        self._kill.clear()
 
     def start(self):
-        self._running = True
+        self.thread = threading.Thread(target=self._schedule)
+        self.thread.start()
 
 
 def schedule(

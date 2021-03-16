@@ -2,8 +2,8 @@ import asyncio
 import functools
 from typing import Callable
 
-from _cache._memmory_db import DataCache, FunctionCache
-from _shared._parser import get_schedule_type
+from ._memmory_db import DataCache, FunctionCache
+from .._shared._parser import get_schedule_type
 
 
 def cache(expires_every: str = None, expires_at: str = None, max_cache_size=50) -> Callable:
@@ -32,6 +32,7 @@ def cache(expires_every: str = None, expires_at: str = None, max_cache_size=50) 
         @functools.wraps(func)
         def sync_wrapper(*args, **kwargs):
             key = DataCache.hash_args(args, kwargs)
+            print("called")
             if data_cache.is_in_cache(key, func):
                 value = data_cache.get_value_from_cache(key, func)
             else:

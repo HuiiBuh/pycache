@@ -34,8 +34,7 @@ class FunctionCache:
         self.cache: Dict[int, CacheEntry] = {}
 
     def is_in_cache(self, key: int) -> bool:
-        return key in self.cache and \
-               self.cache[key].is_valid()
+        return key in self.cache and self.cache[key].is_valid()
 
     def get_value_from_cache(self, key: int) -> Any:
         if self.is_in_cache(key):

@@ -1,8 +1,7 @@
 import re
 from calendar import monthrange
 from datetime import datetime
-
-from enum import Enum
+from enum import IntEnum
 
 
 def _test_valid_string(seconds, minutes, hours):
@@ -98,9 +97,9 @@ def parse_expires_every(expiry_str: str) -> int:
     return seconds
 
 
-class ScheduleType(Enum):
-    EVERY = "every"
-    AT = "at"
+class ScheduleType(IntEnum):
+    EVERY = 0
+    AT = 1
 
 
 def get_schedule_type(expires_every: str = None, expires_at: str = None) -> (ScheduleType, str):
