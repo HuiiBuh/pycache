@@ -89,6 +89,7 @@ please_cache("hello")
 
 ```python3
 from pycache import schedule, add_schedule, ScheduleSubscription
+import asyncio
 
 
 # Gets called every 10 seconds
@@ -112,6 +113,12 @@ def schedule_me():
 # Call with args and keyword args
 @schedule(call_every="10:00:00", args=(3,), kwargs={"hello": "world"})
 def schedule_me(three: int, hello: str):
+    pass
+
+
+# Pass an event loop
+@schedule(call_every="10:00:00", event_loop=your_event_loop)
+async def schedule_me():
     pass
 
 
