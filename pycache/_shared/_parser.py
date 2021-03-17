@@ -48,7 +48,8 @@ def parse_expires_at(schedule_str: str, current: datetime = None) -> datetime:
     # Check if the template syntax has the right ranges
     _test_valid_string(seconds, minutes, hours)
 
-    if current >= datetime(years, months, days, hours, minutes, seconds):
+    return_time = datetime(years, months, days, hours, minutes, seconds)
+    if current >= return_time:
         # If Minutes is the smallest wildcard
         if re.search("^\\*+$", h) and re.search("^\\*+$", m):
             minutes += 1
@@ -76,7 +77,8 @@ def parse_expires_at(schedule_str: str, current: datetime = None) -> datetime:
             years += 1
             months = 1
 
-    return datetime(years, months, days, hours, minutes, seconds)
+        return_time = datetime(years, months, days, hours, minutes, seconds)
+    return return_time
 
 
 def parse_expires_every(expiry_str: str) -> int:
