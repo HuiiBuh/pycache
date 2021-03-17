@@ -101,36 +101,6 @@ def test_expiry_date():
     internal("*:*:*", 0)
 
 
-def test_schedule_time():
-    def internal(cache_str: str, expected_date: datetime):
-        data_cache = DataCache()
-
-        def cache_method():
-            pass
-
-        wrapped_cache_method = cache(expires_at=cache_str)(cache_method)
-
-        wrapped_cache_method()
-
-        key = DataCache.hash_args(tuple(), dict())
-        expiry_date = data_cache.cache[cache_method].cache[key]._timer._expiry_date
-
-        assert expiry_date.year == expected_date.year
-        assert expiry_date.month == expected_date.month
-        assert expiry_date.day == expected_date.day
-        assert expiry_date.hour == expected_date.hour
-        assert expiry_date.minute == expected_date.minute
-        try:
-            assert expiry_date.second == expected_date.second
-        except AssertionError:
-            assert expiry_date.second == expected_date.second - 1
-
-    current = datetime.now()
-    internal("17:00:15", datetime(current.year, current.month, current.day + 1, 17, 0, 15))
-    internal("*:10:00", datetime(current.year, current.month, current.day, current.hour + 1, 10, 00))
-    internal("*:*:12", datetime(current.year, current.month, current.day, current.hour, current.minute + 1, 12))
-
-
 def test_invalid_cache_size():
     with pytest.raises(Exception):
         @cache(expires_every="*:*:1", max_cache_size=-1)
@@ -169,7 +139,7 @@ def test_get_invalid_value():
         data.get_value_from_cache(234, lambda e: e)
 
 
-def test_add_same_funciton():
+def test_add_same_function():
     def empty():
         pass
 
