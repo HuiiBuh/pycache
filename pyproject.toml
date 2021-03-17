@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "py-_cache"
-version = "0.2.0"
+version = "0.3.2"
 description = "Simple to use caching decorator with more capabilites than the default one."
 license = "MIT"
 authors = ["HuiiBuh"]
