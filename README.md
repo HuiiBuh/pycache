@@ -1,4 +1,4 @@
-# Method _cache
+# Functools
 
 [![codecov](https://codecov.io/gh/HuiiBuh/pycache/branch/master/graph/badge.svg?token=WYBEMXAQVO)](https://codecov.io/gh/HuiiBuh/pycache)
 [![Upload Python Package](https://github.com/HuiiBuh/pycache/actions/workflows/publish.yml/badge.svg)](https://github.com/HuiiBuh/pycache/actions/workflows/publish.yml)
@@ -133,5 +133,5 @@ schedule_subscription: ScheduleSubscription = add_schedule(schedule_programmatic
 schedule_subscription.stop()
 
 # Start the schedule again
-schedule_subscription.stop()
+schedule_subscription.start()
 ```
